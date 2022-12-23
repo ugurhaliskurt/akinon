@@ -1,5 +1,5 @@
-#ifndef HANDLER_H
-#define HANDLER_H
+#pragma once
+
 #include <iostream>
 //#include "../dbms/include/Dbms.h"
 #include <sstream>
@@ -16,6 +16,8 @@
 #include <cpprest/rawptrstream.h>               // Async streams backed by raw pointer to memory
 #include <cpprest/producerconsumerstream.h>     // Async streams for producer consumer scenarios
 
+#include "Application.hpp"
+
 using namespace std;
 using namespace web;
 using namespace http;
@@ -30,6 +32,8 @@ struct ClientData
 class handler
 {
     public:
+        Application app;
+
         handler();
         handler(utility::string_t url);
         virtual ~handler();
@@ -53,6 +57,4 @@ class handler
 
         std::multimap<std::string, ClientData> clientDataMap;
 };
-
-#endif // HANDLER_H
 

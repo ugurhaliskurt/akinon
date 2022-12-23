@@ -1,6 +1,5 @@
 #include "Server/RestServer.hpp"
 #include <json.hpp>
-// #include "yfapi.hpp"
 
 
 handler::handler()
@@ -41,33 +40,21 @@ void handler::handle_get(http_request message)
 {
     ucout <<  message.to_string() << endl;
 
-    auto paths = http::uri::split_path(http::uri::decode(message.relative_uri().path()));
-
-    message.relative_uri().path();
-	//Dbms* d  = new Dbms();
-    //d->connect();
-
-    concurrency::streams::fstream::open_istream(U("static/index.html"), std::ios::in).then([=](concurrency::streams::istream is)
+    nlohmann::json parsed_data = nlohmann::json::parse( message.extract_string().get() );
+    ucout << "Operation" << parsed_data["operation"].get<int>() << endl;
+    switch (parsed_data["operation"].get<int>())
     {
-        message.reply(status_codes::OK, is,  U("text/html"))
-		.then([](pplx::task<void> t)
-		{
-			try{
-				t.get();
-			}
-			catch(...){
-				//
-			}
-	});
-    }).then([=](pplx::task<void>t)
-	{
-		try{
-			t.get();
-		}
-		catch(...){
-			message.reply(status_codes::InternalError,U("INTERNAL ERROR "));
-		}
-	});
+    case (int)Operation::ExchangeRate:
+    {
+        auto jsonArray = app.handleExchageRate(parsed_data);
+        message.reply(status_codes::OK,jsonArray.dump());
+        break;
+    }
+    default:
+        message.reply(status_codes::BadRequest);
+        break;
+    }
+
 
     return;
 
@@ -78,32 +65,22 @@ void handler::handle_get(http_request message)
 //
 void handler::handle_post(http_request message)
 {
-    // ucout <<  message.to_string() << endl;
+    nlohmann::json parsed_data = nlohmann::json::parse( message.extract_string().get() );
 
-    // nlohmann::json parsed_data = nlohmann::json::parse( message.extract_string().get() );
-    // yfapi::YahooFinanceAPI api; 
-    // api.set_interval(WEEKLY);
-    // for( auto &element : parsed_data )
-    // {
-    //     ClientData clientData;
-    //     clientData.stockName = element["Name"].get<std::string>();
-    //     clientData.moneyTl = std::stoi( element["Money"].get<std::string>() );
-    //     clientDataMap.insert({element["Date"].get<std::string>() , clientData});
-    // }
-    // std::for_each(clientDataMap.begin(), clientDataMap.end(), [&api](std::pair<std::string,ClientData> pair){
-    //     api.calculate(pair.second.stockName, pair.first, pair.second.moneyTl );
-    // });
-    // clientDataMap.clear();
-    // nlohmann::json myJsonArray = nlohmann::json::array();
-    // nlohmann::json myJson;
-    // for( auto &pair : api.getStockUsdMap() )
-    // {
-    //     myJson["Date"] = pair.first;
-    //     myJson["Value"] = pair.second.value;
-    //     myJson["Paid"] = pair.second.paid;
-    //     myJsonArray.push_back(myJson);
-    // }
-    // message.reply(status_codes::OK,myJsonArray.dump());
+    ucout << "Operation" << parsed_data["operation"].get<int>() << endl;
+    switch (parsed_data["operation"].get<int>())
+    {
+    case (int)Operation::Exchange:
+    {
+        auto jsonArray = app.handleExchage(parsed_data);
+        message.reply(status_codes::OK,jsonArray.dump());
+        break;
+    }
+    default:
+        message.reply(status_codes::BadRequest);
+        break;
+    }
+
     return ;
 };
 

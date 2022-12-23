@@ -2,6 +2,8 @@ set(Sources
 src/main.cpp
 src/Application.cpp
 src/server/RestServer.cpp
+src/client/YahooClient.cpp
+src/InteractionManager.cpp
 )
 
 find_library(CPPREST_LIB cpprest)
