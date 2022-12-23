@@ -43,6 +43,30 @@ nlohmann::json Application::handleExchage(nlohmann::json& parsed_data)
     return myJson;
 }
 
+nlohmann::json Application::handleExchageList(nlohmann::json& parsed_data)
+{
+    std::string transactionId = parsed_data["id"].get<std::string>();
+    if(transactionId != "")
+        return interactionManager.getTransactionById(transactionId).data;
+
+    // search by start date and end date
+    std::string startDate = parsed_data["startDate"].get<std::string>();
+    std::string endDate = parsed_data["endDate"].get<std::string>();
+    auto transactions = interactionManager.getTransactionsByDateFilter(startDate, endDate);
+
+    nlohmann::json myJsonArray = nlohmann::json::array();
+    nlohmann::json myJson;
+    for( auto &element : transactions )
+    {
+        myJson["data"] = element.data;
+        myJson["date"] = element.date;
+        myJson["id"] = element.id;
+        myJsonArray.push_back(myJson);
+    }
+    return myJsonArray;
+}
+
+
 std::vector<std::string> Application::getCurrencies(std::string& targetsStr)
 {
     std::vector<std::string> targets;

@@ -38,3 +38,22 @@ std::string InteractionManager::createInteraction(nlohmann::json& data, std::str
 
     return transaction.id;
 }
+
+Transaction InteractionManager::getTransactionById(std::string id)
+{
+    return idToTransactionMap[id];
+}
+
+std::vector<Transaction> InteractionManager::getTransactionsByDateFilter(std::string startDate, std::string endDate)
+{
+    std::vector<Transaction> result;
+
+    std::vector<std::pair<std::string, std::string>> filteredDatesAndIds(dateToIdMap.lower_bound(startDate), dateToIdMap.upper_bound(endDate));
+
+    for( auto& pair : filteredDatesAndIds )
+    {
+        result.push_back( getTransactionById( pair.second ) );
+    }
+
+    return result;
+}

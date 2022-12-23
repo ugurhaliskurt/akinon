@@ -20,5 +20,7 @@ public:
     InteractionManager(/* args */);
     ~InteractionManager();
     std::string createInteraction(nlohmann::json& data, std::string& date);
+    Transaction getTransactionById(std::string id);
+    std::vector<Transaction> getTransactionsByDateFilter(std::string startDate, std::string endDate);
 };
 

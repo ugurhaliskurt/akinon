@@ -50,6 +50,12 @@ void handler::handle_get(http_request message)
         message.reply(status_codes::OK,jsonArray.dump());
         break;
     }
+    case (int)Operation::ExchangeList:
+    {
+        auto jsonArray = app.handleExchageList(parsed_data);
+        message.reply(status_codes::OK,jsonArray.dump());
+        break;
+    }
     default:
         message.reply(status_codes::BadRequest);
         break;

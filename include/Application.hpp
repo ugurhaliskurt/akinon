@@ -25,4 +25,5 @@ private:
 public:
     nlohmann::json handleExchage(nlohmann::json& parsed_data);
     nlohmann::json handleExchageRate(nlohmann::json& parsed_data);
+    nlohmann::json handleExchageList(nlohmann::json& parsed_data);
 };
