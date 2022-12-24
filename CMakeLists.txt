@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIC" ) # -fpic --coverage
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-project( SomeProject
+project( AkinonExchange
          VERSION 1.0.0
          DESCRIPTION "Code Coverage Sample Project!"
          LANGUAGES CXX
@@ -66,7 +66,7 @@ endif()
 # clang tidy task
 add_custom_target(clangtidy
 # COMMAND clang-tidy -checks='*' -p ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/include/**/*.hpp > clang-tidy-report.txt
-COMMAND clang-tidy -checks='*' -header-filter="^include" -p . ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/include/application/*.hpp > clang-tidy-report.txt
+COMMAND clang-tidy -checks='*' -header-filter="^include" -p . ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/include/*.hpp > clang-tidy-report.txt
 )
 
 # 66e4e6072b0763410f7aaa09550dc174a03fd45f
