@@ -38,32 +38,39 @@ void handler::handle_error(pplx::task<void>& t)
 //
 void handler::handle_get(http_request message)
 {
-    ucout <<  message.to_string() << endl;
-
-    nlohmann::json parsed_data = nlohmann::json::parse( message.extract_string().get() );
-    ucout << "Operation" << parsed_data["operation"].get<int>() << endl;
-    switch (parsed_data["operation"].get<int>())
+    try
     {
-    case (int)Operation::ExchangeRate:
-    {
-        auto jsonArray = app.handleExchageRate(parsed_data);
-        message.reply(status_codes::OK,jsonArray.dump());
-        break;
+        ucout <<  message.to_string() << endl;
+        nlohmann::json parsed_data = nlohmann::json::parse( message.extract_string().get() );
+        ucout << "Operation" << parsed_data["operation"].get<int>() << endl;
+        switch (parsed_data["operation"].get<int>())
+        {
+            case (int)Operation::ExchangeRate:
+            {
+                auto jsonArray = app.handleExchageRate(parsed_data);
+                message.reply(status_codes::OK,jsonArray.dump());
+                break;
+            }
+            case (int)Operation::ExchangeList:
+            {
+                auto jsonArray = app.handleExchageList(parsed_data);
+                message.reply(status_codes::OK,jsonArray.dump());
+                break;
+            }
+            default:
+                message.reply(status_codes::BadRequest);
+                break;
+        }
     }
-    case (int)Operation::ExchangeList:
+    catch(const std::exception& e)
     {
-        auto jsonArray = app.handleExchageList(parsed_data);
-        message.reply(status_codes::OK,jsonArray.dump());
-        break;
-    }
-    default:
+        std::cerr << e.what() << '\n';
         message.reply(status_codes::BadRequest);
-        break;
     }
-
-
-    return;
-
+    catch(...)
+    {
+        message.reply(status_codes::InternalError);
+    }
 };
 
 //
@@ -71,23 +78,33 @@ void handler::handle_get(http_request message)
 //
 void handler::handle_post(http_request message)
 {
-    nlohmann::json parsed_data = nlohmann::json::parse( message.extract_string().get() );
+    try
+    {
+        nlohmann::json parsed_data = nlohmann::json::parse( message.extract_string().get() );
 
-    ucout << "Operation" << parsed_data["operation"].get<int>() << endl;
-    switch (parsed_data["operation"].get<int>())
-    {
-    case (int)Operation::Exchange:
-    {
-        auto jsonArray = app.handleExchage(parsed_data);
-        message.reply(status_codes::OK,jsonArray.dump());
-        break;
+        ucout << "Operation" << parsed_data["operation"].get<int>() << endl;
+        switch (parsed_data["operation"].get<int>())
+        {
+        case (int)Operation::Exchange:
+        {
+            auto jsonArray = app.handleExchage(parsed_data);
+            message.reply(status_codes::OK,jsonArray.dump());
+            break;
+        }
+        default:
+            message.reply(status_codes::BadRequest);
+            break;
+        }
     }
-    default:
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
         message.reply(status_codes::BadRequest);
-        break;
     }
-
-    return ;
+    catch(...)
+    {
+        message.reply(status_codes::InternalError);
+    }
 };
 
 //
@@ -99,7 +116,6 @@ void handler::handle_delete(http_request message)
 
         string rep = U("WRITE YOUR OWN DELETE OPERATION");
       message.reply(status_codes::OK,rep);
-    return;
 };
 
 
@@ -111,7 +127,6 @@ void handler::handle_put(http_request message)
     ucout <<  message.to_string() << endl;
      string rep = U("WRITE YOUR OWN PUT OPERATION");
      message.reply(status_codes::OK,rep);
-    return;
 };
 
 void handler::handle_options(http_request request)
@@ -127,18 +142,14 @@ void handler::handle_options(http_request request)
 void handler::on_initialize(const string& address)
 {
     uri_builder uri(address);
-  
-
     auto addr = uri.to_uri().to_string();
     open().wait();
 
     ucout << utility::string_t(U("Listening for requests at: ")) << addr << std::endl;
 
-    return;
 }
 
 void handler::on_shutdown()
 {
     close().wait();
-    return;
 }

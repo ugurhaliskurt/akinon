@@ -3,7 +3,8 @@
 #include <unordered_map>
 #include <sstream>
 #include <iostream>
-#include <algorithm> 
+#include <algorithm>
+#include <chrono>
 
 inline bool string_replace(std::string& str, const std::string from, const std::string to)
 {
@@ -37,13 +38,20 @@ inline std::unordered_map< std::string, double > convertDateValueMap(std::string
         line.substr(line.find(',')+1); //High
         line.substr(line.find(',')+1); //low
         std::string value = line.substr(line.find(',')+1); //Close
-        try{
-            result[key] = std::stod(value);
-        }
-        catch(...)
-        {
-        }
-        
+        result[key] = std::stod(value);     
     }
     return result;
+}
+
+inline std::string yearMonthDayDateNow()
+{
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    time_t tt = std::chrono::system_clock::to_time_t(now);
+    tm local_tm = *localtime(&tt);
+    std::string yearMonthDay = std::to_string( local_tm.tm_year + 1900 ) + ("-") + 
+                                std::to_string( local_tm.tm_mon + 1 ) + ("-") + 
+                                std::to_string( local_tm.tm_mday );
+
+    std::cout << yearMonthDay << std::endl;
+    return yearMonthDay;
 }

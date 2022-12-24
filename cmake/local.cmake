@@ -1,5 +1,4 @@
 set(Sources
-src/main.cpp
 src/Application.cpp
 src/server/RestServer.cpp
 src/client/YahooClient.cpp
@@ -11,17 +10,24 @@ find_package(Boost REQUIRED COMPONENTS filesystem)
 find_package(OpenSSL 1.0.0 REQUIRED)
 
 # set(CMAKE_CXX_CLANG_TIDY "clang-tidy;checks=-*")
-add_executable(${EXE_NAME}
+add_library(${LIB_NAME} SHARED
 ${Sources}
 )
 
-target_link_libraries( ${EXE_NAME} PUBLIC
+add_executable(${EXE_NAME} "src/main.cpp"
+)
+
+target_link_libraries( ${LIB_NAME} PUBLIC
 ${CPPREST_LIB}
 -lcurl
 -lpthread
 -lcrypto
 OpenSSL::SSL
 Boost::filesystem
+)
+
+target_link_libraries(${EXE_NAME}
+${LIB_NAME}
 )
 # add_coverage(${EXE_NAME})
 # add_coverage(${LIB_NAME})

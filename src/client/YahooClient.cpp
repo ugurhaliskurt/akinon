@@ -43,6 +43,7 @@ std::pair<std::string, double> YahooClient::getExchangeListBasedOnParameter( std
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
+        throw e;
     }
     return result;
 }

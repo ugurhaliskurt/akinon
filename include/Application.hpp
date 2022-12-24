@@ -23,6 +23,7 @@ private:
     std::vector<std::string> getCurrencies(std::string& targetsStr);
     std::vector<std::string> createSymbols(std::string& source, std::string& targetsStr);
 public:
+    InteractionManager& getInteractionManager() {return interactionManager;}
     nlohmann::json handleExchage(nlohmann::json& parsed_data);
     nlohmann::json handleExchageRate(nlohmann::json& parsed_data);
     nlohmann::json handleExchageList(nlohmann::json& parsed_data);

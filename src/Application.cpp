@@ -1,68 +1,110 @@
 #include "Banner.hpp"
 #include "Application.hpp"
+#include "utilities.hpp"
 
 nlohmann::json Application::handleExchageRate(nlohmann::json& parsed_data)
 {
-    std::string source = parsed_data["source"].get<std::string>();
-    std::string targetsStr = parsed_data["targets"].get<std::string>();
-    std::vector<std::string> symbols = createSymbols(source, targetsStr);
-
-    std::unordered_map<std::string, double> rates;
-    for( auto& symbol : symbols )
-        rates.insert( yahooClient.getExchangeListBasedOnParameter(symbol));
-    
     nlohmann::json myJson;
-    for( auto &pair : rates )
+    std::cout << "**********" << parsed_data.dump() << std::endl;
+    try
+    {    
+        std::string source = parsed_data["source"].get<std::string>();
+        std::string targetsStr = parsed_data["targets"].get<std::string>();
+        std::vector<std::string> symbols = createSymbols(source, targetsStr);
+
+        std::unordered_map<std::string, double> rates;
+        for( auto& symbol : symbols )
+            rates.insert( yahooClient.getExchangeListBasedOnParameter(symbol));
+        
+        for( auto &pair : rates )
+        {
+            myJson[pair.first] = pair.second;
+        }
+    }
+    catch(const std::exception& e)
     {
-        myJson[pair.first] = pair.second;
+        std::cerr << e.what() << '\n';
+        throw e;
+    }
+    catch(...)
+    {
+        std::cout<<"General Error happened" << std::endl;
+        throw;
     }
     return myJson;
 }
 
 nlohmann::json Application::handleExchage(nlohmann::json& parsed_data)
 {
-    int amount = parsed_data["amount"].get<int>();
-    std::string source = parsed_data["source"].get<std::string>();
-    std::string targetsStr = parsed_data["targets"].get<std::string>();
-    std::vector<std::string> symbols = createSymbols(source, targetsStr);
-
-    std::unordered_map<std::string, double> rates;
-    for( auto& symbol : symbols )
-        rates.insert( yahooClient.getExchangeListBasedOnParameter(symbol));
-    
     nlohmann::json myJson;
+    try
+    {    
+        int amount = parsed_data["amount"].get<int>();
+        std::string source = parsed_data["source"].get<std::string>();
+        std::string targetsStr = parsed_data["targets"].get<std::string>();
+        std::vector<std::string> symbols = createSymbols(source, targetsStr);
 
-    for( auto &pair : rates )
-    {
-        myJson[pair.first] = amount * pair.second;
+        std::unordered_map<std::string, double> rates;
+        for( auto& symbol : symbols )
+            rates.insert( yahooClient.getExchangeListBasedOnParameter(symbol));
+
+        for( auto &pair : rates )
+        {
+            myJson[pair.first] = amount * pair.second;
+        }
+        //ToDo
+        std::string date = yearMonthDayDateNow();
+        auto id = interactionManager.createInteraction(myJson,date);
+        myJson["id"] = id;
     }
-    //ToDo
-    std::string date = "2022-12-24";
-    auto id = interactionManager.createInteraction(myJson,date);
-    myJson["id"] = id;
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        throw e;
+    }
+    catch(...)
+    {
+        std::cout<<"General Error happened" << std::endl;
+        throw;
+    }
     return myJson;
 }
 
 nlohmann::json Application::handleExchageList(nlohmann::json& parsed_data)
 {
-    std::string transactionId = parsed_data["id"].get<std::string>();
-    if(transactionId != "")
-        return interactionManager.getTransactionById(transactionId).data;
-
-    // search by start date and end date
-    std::string startDate = parsed_data["startDate"].get<std::string>();
-    std::string endDate = parsed_data["endDate"].get<std::string>();
-    auto transactions = interactionManager.getTransactionsByDateFilter(startDate, endDate);
-
     nlohmann::json myJsonArray = nlohmann::json::array();
-    nlohmann::json myJson;
-    for( auto &element : transactions )
+    try
     {
-        myJson["data"] = element.data;
-        myJson["date"] = element.date;
-        myJson["id"] = element.id;
-        myJsonArray.push_back(myJson);
+        std::string transactionId = parsed_data["id"].get<std::string>();
+        if(transactionId != "")
+            return interactionManager.getTransactionById(transactionId).data;
+
+        // search by start date and end date
+        std::string startDate = parsed_data["startDate"].get<std::string>();
+        std::string endDate = parsed_data["endDate"].get<std::string>();
+        auto transactions = interactionManager.getTransactionsByDateFilter(startDate, endDate);
+
+
+        nlohmann::json myJson;
+        for( auto &element : transactions )
+        {
+            myJson["data"] = element.data;
+            myJson["date"] = element.date;
+            myJson["id"] = element.id;
+            myJsonArray.push_back(myJson);
+        }
     }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        throw e;
+    }
+    catch(...)
+    {
+        std::cout<<"General Error happened" << std::endl;
+        throw;
+    }
+
     return myJsonArray;
 }
 
